@@ -125,8 +125,8 @@ maintained personally, all features are free. If you would like to treat the cre
 >If you choose to donate, remember to note your nickname, I will register it to this page at free time.
 
 <div align="center">
-    <img src="https://cdn.jsdelivr.net/gh/jitwxs/cdn/blog/configuration/alipay_donate_full.jpg" height="200" style="float:left;margin-right:20px;margin-left: 310px">
-    <img src="https://cdn.jsdelivr.net/gh/jitwxs/cdn/blog/configuration/wechat_donate_full.jpg" height="200" style="float:left">
+	<img src="https://cdn.jsdelivr.net/gh/jitwxs/cdn/blog/configuration/alipay_donate_full.jpg" height="200" style="float:left;margin-right:20px;margin-left: 310px">
+	<img src="https://cdn.jsdelivr.net/gh/jitwxs/cdn/blog/configuration/wechat_donate_full.jpg" height="200" style="float:left">
 </div>
 
 最后，感谢 JetBrains 为本项目提供 IDE 赞助。

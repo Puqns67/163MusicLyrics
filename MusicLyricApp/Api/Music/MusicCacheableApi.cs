@@ -1,82 +1,82 @@
-﻿using System.Collections.Generic;
-using System.Linq;
 using MusicLyricApp.Bean;
 using MusicLyricApp.Cache;
 using MusicLyricApp.Utils;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MusicLyricApp.Api.Music
 {
-    public abstract class MusicCacheableApi : IMusicApi
-    {
-        protected abstract SearchSourceEnum Source0();
-        
-        protected abstract ResultVo<PlaylistVo> GetPlaylistVo0(string playlistId);
-        
-        protected abstract ResultVo<AlbumVo> GetAlbumVo0(string albumId);
+	public abstract class MusicCacheableApi : IMusicApi
+	{
+		protected abstract SearchSourceEnum Source0();
 
-        protected abstract Dictionary<string, ResultVo<SongVo>> GetSongVo0(string[] songIds);
-        
-        protected abstract ResultVo<string> GetSongLink0(string songId);
+		protected abstract ResultVo<PlaylistVo> GetPlaylistVo0(string playlistId);
 
-        protected abstract ResultVo<LyricVo> GetLyricVo0(string id, string displayId, bool isVerbatim);
+		protected abstract ResultVo<AlbumVo> GetAlbumVo0(string albumId);
 
-        protected abstract  ResultVo<SearchResultVo> Search0(string keyword, SearchTypeEnum searchType);
+		protected abstract Dictionary<string, ResultVo<SongVo>> GetSongVo0(string[] songIds);
 
-        public SearchSourceEnum Source()
-        {
-            return Source0();
-        }
+		protected abstract ResultVo<string> GetSongLink0(string songId);
 
-        public ResultVo<PlaylistVo> GetPlaylistVo(string playlistId)
-        {
-            return GlobalCache.Process(Source(), CacheType.PLAYLIST_VO, playlistId, () => GetPlaylistVo0(playlistId));
-        }
+		protected abstract ResultVo<LyricVo> GetLyricVo0(string id, string displayId, bool isVerbatim);
 
-        public ResultVo<AlbumVo> GetAlbumVo(string albumId)
-        {
-            return GlobalCache.Process(Source(), CacheType.ALBUM_VO, albumId, () => GetAlbumVo0(albumId));
-        }
+		protected abstract ResultVo<SearchResultVo> Search0(string keyword, SearchTypeEnum searchType);
 
-        public Dictionary<string, ResultVo<SongVo>> GetSongVo(string[] songIds)
-        {
-            var result = GlobalCache.BatchQuery<SongVo>(Source(), CacheType.SONG_VO, songIds, 
-                    out var notHitKeys).ToDictionary(pair => pair.Key, pair => new ResultVo<SongVo>(pair.Value));
+		public SearchSourceEnum Source()
+		{
+			return Source0();
+		}
 
-            foreach(var pair in GetSongVo0(notHitKeys))
-            {
-                var songId = pair.Key;
-                var resultVo = pair.Value;
-                
-                if (resultVo.IsSuccess())
-                {
-                    GlobalCache.DoCache(Source(), CacheType.SONG_VO, songId, resultVo.Data);
-                }
-                
-                result[songId] = pair.Value;
-            }
+		public ResultVo<PlaylistVo> GetPlaylistVo(string playlistId)
+		{
+			return GlobalCache.Process(Source(), CacheType.PLAYLIST_VO, playlistId, () => GetPlaylistVo0(playlistId));
+		}
 
-            return result;
-        }
+		public ResultVo<AlbumVo> GetAlbumVo(string albumId)
+		{
+			return GlobalCache.Process(Source(), CacheType.ALBUM_VO, albumId, () => GetAlbumVo0(albumId));
+		}
 
-        public ResultVo<string> GetSongLink(string songId)
-        {
-            return GlobalCache.Process(Source(), CacheType.SONG_LINK, songId, () => GetSongLink0(songId));
-        }
+		public Dictionary<string, ResultVo<SongVo>> GetSongVo(string[] songIds)
+		{
+			var result = GlobalCache.BatchQuery<SongVo>(Source(), CacheType.SONG_VO, songIds,
+					out var notHitKeys).ToDictionary(pair => pair.Key, pair => new ResultVo<SongVo>(pair.Value));
 
-        public ResultVo<LyricVo> GetLyricVo(string id, string displayId, bool isVerbatim)
-        {
-            ResultVo<LyricVo> CacheFunc() => GetLyricVo0(id, displayId, isVerbatim);
+			foreach (var pair in GetSongVo0(notHitKeys))
+			{
+				var songId = pair.Key;
+				var resultVo = pair.Value;
 
-            return GlobalCache.Process(Source(), CacheType.LYRIC_VO, GlobalUtils.GetSongKey(displayId, isVerbatim), CacheFunc);
-        }
+				if (resultVo.IsSuccess())
+				{
+					GlobalCache.DoCache(Source(), CacheType.SONG_VO, songId, resultVo.Data);
+				}
 
-        public ResultVo<SearchResultVo> Search(string keyword, SearchTypeEnum searchType)
-        {
-            var cacheKey = Source0() + "_" + searchType + "_" + keyword;
+				result[songId] = pair.Value;
+			}
 
-            ResultVo<SearchResultVo> CacheFunc() => Search0(keyword, searchType);
+			return result;
+		}
 
-            return GlobalCache.Process(Source(), CacheType.SEARCH_RESULT_VO, cacheKey, CacheFunc);
-        }
-    }
+		public ResultVo<string> GetSongLink(string songId)
+		{
+			return GlobalCache.Process(Source(), CacheType.SONG_LINK, songId, () => GetSongLink0(songId));
+		}
+
+		public ResultVo<LyricVo> GetLyricVo(string id, string displayId, bool isVerbatim)
+		{
+			ResultVo<LyricVo> CacheFunc() => GetLyricVo0(id, displayId, isVerbatim);
+
+			return GlobalCache.Process(Source(), CacheType.LYRIC_VO, GlobalUtils.GetSongKey(displayId, isVerbatim), CacheFunc);
+		}
+
+		public ResultVo<SearchResultVo> Search(string keyword, SearchTypeEnum searchType)
+		{
+			var cacheKey = Source0() + "_" + searchType + "_" + keyword;
+
+			ResultVo<SearchResultVo> CacheFunc() => Search0(keyword, searchType);
+
+			return GlobalCache.Process(Source(), CacheType.SEARCH_RESULT_VO, cacheKey, CacheFunc);
+		}
+	}
 }

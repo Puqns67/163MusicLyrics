@@ -4,96 +4,96 @@ using System.Text;
 
 namespace MusicLyricApp.Bean
 {
-    public class CsvBean
-    {
-        public readonly List<string> Title;
-        
-        public readonly List<List<string>> Lines;
+	public class CsvBean
+	{
+		public readonly List<string> Title;
 
-        private int _curLine;
+		public readonly List<List<string>> Lines;
 
-        public CsvBean()
-        {
-            Title = new List<string>();
-            Lines = new List<List<string>>();
-        }
+		private int _curLine;
 
-        public void AddColumn(string name)
-        {
-            Title.Add(name);
-        }
+		public CsvBean()
+		{
+			Title = new List<string>();
+			Lines = new List<List<string>>();
+		}
 
-        public void AddData(string data)
-        {
-            while (Lines.Count <= _curLine)
-            {
-                Lines.Add(new List<string>());
-            }
-            
-            Lines[_curLine].Add(data);
-        }
+		public void AddColumn(string name)
+		{
+			Title.Add(name);
+		}
 
-        public void NextLine()
-        {
-            _curLine++;
-        }
+		public void AddData(string data)
+		{
+			while (Lines.Count <= _curLine)
+			{
+				Lines.Add(new List<string>());
+			}
 
-        public override string ToString()
-        {
-            var sb = new StringBuilder();
+			Lines[_curLine].Add(data);
+		}
 
-            sb
-                .Append(string.Join(",", Title))
-                .Append(Environment.NewLine);
-            
-            foreach (var line in Lines)
-            {
-                sb
-                    .Append(string.Join(",", line))
-                    .Append(Environment.NewLine);
-            }
+		public void NextLine()
+		{
+			_curLine++;
+		}
 
-            return sb.ToString();
-        }
+		public override string ToString()
+		{
+			var sb = new StringBuilder();
 
-        public static CsvBean Deserialization(string str)
-        {
-            var csvBean = new CsvBean();
+			sb
+				.Append(string.Join(",", Title))
+				.Append(Environment.NewLine);
 
-            try
-            {
-                var lines = str.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+			foreach (var line in Lines)
+			{
+				sb
+					.Append(string.Join(",", line))
+					.Append(Environment.NewLine);
+			}
 
-                foreach (var name in lines[0].Split(','))
-                {
-                    csvBean.AddColumn(name);
-                }
+			return sb.ToString();
+		}
 
-                for (var i = 1; i < lines.Length; i++)
-                {
-                    var line = lines[i];
-                    if (string.IsNullOrWhiteSpace(line))
-                    {
-                        continue;
-                    }
+		public static CsvBean Deserialization(string str)
+		{
+			var csvBean = new CsvBean();
 
-                    foreach (var data in line.Split(','))
-                    {
-                        csvBean.AddData(data);
-                    }
+			try
+			{
+				var lines = str.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
-                    csvBean.NextLine();
-                }
+				foreach (var name in lines[0].Split(','))
+				{
+					csvBean.AddColumn(name);
+				}
 
-                // delete last line
-                csvBean._curLine--;
-            }
-            catch (System.Exception)
-            {
-                // ignored
-            }
+				for (var i = 1; i < lines.Length; i++)
+				{
+					var line = lines[i];
+					if (string.IsNullOrWhiteSpace(line))
+					{
+						continue;
+					}
 
-            return csvBean;
-        }
-    }
+					foreach (var data in line.Split(','))
+					{
+						csvBean.AddData(data);
+					}
+
+					csvBean.NextLine();
+				}
+
+				// delete last line
+				csvBean._curLine--;
+			}
+			catch (System.Exception)
+			{
+				// ignored
+			}
+
+			return csvBean;
+		}
+	}
 }
